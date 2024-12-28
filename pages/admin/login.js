@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
+import { firestore } from "@/utils/firebase";  // Your Firebase setup
+import { doc, getDoc } from "firebase/firestore"; // Import getDoc from Firestore
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
@@ -7,18 +9,32 @@ export default function AdminLogin() {
   const [error, setError] = useState(null);
   const router = useRouter();
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    // Simple username and password check (replace with real authentication logic)
-    if (username === "admin" && password === "admin123") {
-      // Store an admin token in localStorage
-      localStorage.setItem("admin_token", "your_admin_token_here");
+    try {
+      // Fetch the admin details from Firestore
+      const docRef = doc(firestore, "admins", "admin");
+      const docSnap = await getDoc(docRef);
 
-      // Redirect to the admin dashboard
-      router.push("/admin");
-    } else {
-      setError("Invalid username or password");
+      if (docSnap.exists()) {
+        const adminData = docSnap.data();
+        // Compare the entered username and password with the stored details
+        if (username === adminData.username && password === adminData.password) {
+          // Store an admin token in localStorage
+          localStorage.setItem("admin_token", "your_admin_token_here");
+
+          // Redirect to the admin dashboard
+          router.push("/admin");
+        } else {
+          setError("Invalid username or password");
+        }
+      } else {
+        console.error("Admin details not found in Firestore.");
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      setError("An error occurred. Please try again.");
     }
   };
 
