@@ -269,8 +269,6 @@ const handleScanForGoods = () => {
   const completeSale = async () => {
     if (cart.length === 0 || amountPaid === 0 || !salesRepUsername) {
       alert("Cart, amount paid, and salesRepUsername cannot be empty");
-
-      // setError("Cart, amount paid, and salesRepUsername cannot be empty.");
       return;
     }
   
@@ -278,7 +276,7 @@ const handleScanForGoods = () => {
   
     try {
       const newSale = {
-        salesRepUsername, // Store sale under salesRep username
+        salesRepUsername,
         items: cart,
         total,
         amountPaid,
@@ -286,44 +284,63 @@ const handleScanForGoods = () => {
         timestamp: serverTimestamp(),
       };
   
-      // Add the sale to Firestore
       const saleRef = await addDoc(collection(firestore, "sales"), newSale);
       setSuccess("Sale completed successfully!");
   
-      // Initialize a batch to update stock
       const batch = writeBatch(firestore);
   
-      // Now, update stock for each item in the cart
       cart.forEach((item) => {
-        const goodsRef = doc(firestore, 'goods', item.id); // Correct usage of Firestore instance
-        const newStock = item.stock - item.quantity; // Subtract quantity from stock
+        const goodsRef = doc(firestore, 'goods', item.id);
+        const newStock = item.stock - item.quantity;
   
-        // Only update stock if there's enough stock available
         if (newStock >= 0) {
           batch.update(goodsRef, { stock: newStock });
         } else {
-          alert("Not enough stock for", item.name);
-
-          console.error("Not enough stock for", item.name);
+          alert(`Not enough stock for ${item.name}`);
         }
       });
   
-      // Commit the batch to update stock
       await batch.commit();
+  
+      // Generate receipt content
+      const receiptContent = `
+        <div>
+          <h1>Receipt</h1>
+          <p>Sales Rep: ${salesRepUsername}</p>
+          <p>Total: ${total}</p>
+          <p>Amount Paid: ${amountPaid}</p>
+          <p>Change Given: ${changeGiven}</p>
+          <ul>
+            ${cart.map(item => `<li>${item.name} - ${item.quantity} x ${item.price}</li>`).join('')}
+          </ul>
+          <p>Thank you for your purchase!</p>
+        </div>
+        <style>
+  body { font-family: Arial, sans-serif; padding: 20px; }
+  h1 { text-align: center; }
+  ul { list-style: none; padding: 0; }
+  li { margin: 5px 0; }
+</style>
+
+      `;
+  
+      // Open a new window for the receipt and print
+      const printWindow = window.open('', '_blank');
+      printWindow.document.write(receiptContent);
+      printWindow.document.close();
+      printWindow.print();
   
       // Reset the cart and other values
       setCart([]);
       setTotal(0);
       setAmountPaid(0);
-  
-      // Fetch sales again to refresh the data
       fetchSales(salesRepUsername);
-  
     } catch (error) {
       console.error("Error completing sale:", error);
       alert("Failed to complete sale.");
     }
   };
+  
   
   
 

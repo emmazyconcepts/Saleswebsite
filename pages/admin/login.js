@@ -21,12 +21,11 @@ export default function AdminLogin() {
         const adminData = docSnap.data();
         // Compare the entered username and password with the stored details
         if (username === adminData.username && password === adminData.password) {
-          // Store an admin token in localStorage
+          // Store an admin token in localStorage 
           localStorage.setItem("admin_token", "your_admin_token_here");
 
           // Redirect to the admin dashboard
           router.push("/admin");
-        } else {
           setError("Invalid username or password");
         }
       } else {

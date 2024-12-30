@@ -32,45 +32,63 @@ export default function SalesHistory() {
   }, [router]);
 
   const calculatePerformanceMetrics = (salesData) => {
-    let totalSalesAmount = 0;
-    let totalSalesCount = 0;
-    let itemSales = {};
-
+    let totalSalesAmount = 0; // Total sales amount for the sales rep
+    let totalSalesCount = 0; // Total number of sales transactions
+    let totalProfit = 0; // Total profit for the sales rep
+    let itemSales = {}; // Track individual item sales
+  
     Object.keys(salesData).forEach((date) => {
       salesData[date].sales.forEach((sale) => {
-        totalSalesAmount += sale.total;
-        totalSalesCount += 1;
-
+        totalSalesAmount += sale.total; // Add the sale total to the total sales amount
+        totalSalesCount += 1; // Increment the sales count
+  
         sale.items.forEach((item) => {
           if (!itemSales[item.name]) {
-            itemSales[item.name] = { totalAmount: 0, quantitySold: 0 };
+            itemSales[item.name] = {
+              totalAmount: 0,
+              quantitySold: 0,
+              totalProfit: 0, // Initialize totalProfit for each item
+            };
           }
-          itemSales[item.name].totalAmount += item.price * item.quantity;
-          itemSales[item.name].quantitySold += item.quantity;
+  
+          const itemRevenue = item.price * item.quantity; // Revenue from the item
+          const itemProfit = (item.price - item.costPrice) * item.quantity; // Profit from the item
+  
+          itemSales[item.name].totalAmount += itemRevenue; // Add revenue to the item's total amount
+          itemSales[item.name].quantitySold += item.quantity; // Add the quantity sold
+          itemSales[item.name].totalProfit += itemProfit; // Add the profit for the item
+  
+          totalProfit += itemProfit; // Add the profit to the total profit
         });
       });
     });
-
+  
     const topSellingItems = Object.keys(itemSales)
       .map((itemName) => ({
         name: itemName,
         totalAmount: itemSales[itemName].totalAmount,
         quantitySold: itemSales[itemName].quantitySold,
+        totalProfit: itemSales[itemName].totalProfit, // Include the total profit for this item
       }))
       .sort((a, b) => b.totalAmount - a.totalAmount)
-      .slice(0, 3);
-
+      .slice(0, 3); // Get the top 3 selling items
+  
     const averageSaleAmount = totalSalesCount
       ? totalSalesAmount / totalSalesCount
-      : 0;
-
+      : 0; // Calculate average sale amount
+  
     return {
       totalSalesAmount,
       averageSaleAmount,
       totalSalesCount,
+      totalProfit,
       topSellingItems,
     };
   };
+  
+  
+  
+  
 
   const fetchSales = async (salesRepUsername) => {
     try {
@@ -140,6 +158,10 @@ export default function SalesHistory() {
   if (loading) return <p>Loading...</p>;
   if (error) return <p className="text-red-500">{error}</p>;
 
+
+
+  
+
   return (
     <AdminDashboardLayout>
       <div className="min-h-screen p-6">
@@ -151,31 +173,35 @@ export default function SalesHistory() {
             </p>
           </div>
 
-          {/* Performance Metrics */}
-          <div className="bg-indigo-50 p-6 rounded-lg shadow mb-6">
-            <h2 className="text-2xl font-bold text-indigo-700 mb-4">
-              Performance Metrics
-            </h2>
-            <p className="text-gray-700">
-              <strong>Total Sales Amount:</strong> #{performanceMetrics.totalSalesAmount}
-            </p>
-            <p className="text-gray-700">
-              <strong>Average Sale Amount:</strong> #{performanceMetrics.averageSaleAmount.toFixed(2)}
-            </p>
-            <p className="text-gray-700">
-              <strong>Total Sales Count:</strong> {performanceMetrics.totalSalesCount}
-            </p>
-            <div className=" text-black">
-              <strong>Top-Selling Items:</strong>
-              <ul className="mt-2 list-disc pl-6">
-                {performanceMetrics.topSellingItems.map((item, index) => (
-                  <li key={index}>
-                    {item.name} - #{item.totalAmount} ({item.quantitySold} sold)
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+       {/* Performance Metrics */}
+<div className="bg-indigo-50 p-6 rounded-lg shadow mb-6">
+  <h2 className="text-2xl font-bold text-indigo-700 mb-4">
+    Performance Metrics
+  </h2>
+  <p className="text-gray-700">
+    <strong>Total Sales Amount:</strong> #{performanceMetrics.totalSalesAmount}
+  </p>
+  <p className="text-gray-700">
+    <strong>Average Sale Amount:</strong> #{performanceMetrics.averageSaleAmount.toFixed(2)}
+  </p>
+  <p className="text-gray-700">
+    <strong>Total Sales Count:</strong> {performanceMetrics.totalSalesCount}
+  </p>
+  <p className="text-gray-700">
+    <strong>Total Profit:</strong> #{performanceMetrics.totalProfit.toFixed(2)}
+  </p>
+  <div className=" text-black">
+    <strong>Top-Selling Items:</strong>
+    <ul className="mt-2 list-disc pl-6">
+      {performanceMetrics.topSellingItems.map((item, index) => (
+        <li key={index}>
+          {item.name} - #{item.totalAmount} ({item.quantitySold} sold, Profit: #{item.totalProfit.toFixed(2)})
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+
 
           {/* Date Picker */}
           <div className="mb-6">
