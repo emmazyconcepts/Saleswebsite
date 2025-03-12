@@ -313,16 +313,18 @@ export default function SalesRepDashboard() {
     <p>08035493389 | 08026293977 | 07066290577</p>
   </div>
 
-  <div class="receipt-details">
+x
+
+  <ul>
+    ${cart.map(item => `<li>${item.name} - ${item.quantity} x ${item.price}</li>`).join('')}
+  </ul>
+
+    <div class="receipt-details">
     <p><strong>Sales Rep:</strong> ${salesRepUsername}</p>
     <p><strong>Total:</strong> ${total}</p>
     <p><strong>Amount Paid:</strong> ${amountPaid}</p>
     <p><strong>Change Given:</strong> ${changeGiven}</p>
   </div>
-
-  <ul>
-    ${cart.map(item => `<li>${item.name} - ${item.quantity} x ${item.price}</li>`).join('')}
-  </ul>
 
   <div class="footer">
     <p>Thank you for your purchase!</p>
