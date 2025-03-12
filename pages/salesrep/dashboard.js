@@ -304,27 +304,89 @@ export default function SalesRepDashboard() {
 
       // Generate receipt content
       const receiptContent = `
-        <div>
-          <h1>Receipt</h1>
-                    <h2>OMO EKO PROVISION STORE</h2>
+       <body>
+  <h1>OMO EKO PROVISION STORE</h1>
+  <h2>Receipt</h2>
 
-          <p>Sales Rep: ${salesRepUsername}</p>
-          <p>Total: ${total}</p>
-          <p>Amount Paid: ${amountPaid}</p>
-          <p>Change Given: ${changeGiven}</p>
-          <ul>
-            ${cart.map(item => `<li>${item.name} - ${item.quantity} x ${item.price}</li>`).join('')}
-          </ul>
-          <p>Thank you for your purchase!</p>
-          <p>Goods taken in good condition can’t be returned</p>
+  <div class="store-info">
+    <p>No 1 Alagbo Plaza, Opposite African Primary School, Sango Saki</p>
+    <p>08035493389 | 08026293977 | 07066290577</p>
+  </div>
 
-        </div>
+  <div class="receipt-details">
+    <p><strong>Sales Rep:</strong> ${salesRepUsername}</p>
+    <p><strong>Total:</strong> ${total}</p>
+    <p><strong>Amount Paid:</strong> ${amountPaid}</p>
+    <p><strong>Change Given:</strong> ${changeGiven}</p>
+  </div>
+
+  <ul>
+    ${cart.map(item => `<li>${item.name} - ${item.quantity} x ${item.price}</li>`).join('')}
+  </ul>
+
+  <div class="footer">
+    <p>Thank you for your purchase!</p>
+    <p>Goods taken in good condition can’t be returned.</p>
+  </div>
+</body>
         <style>
-          body { font-family: Arial, sans-serif; padding: 20px; }
-          h1 { text-align: center; }
-          h2 { text-align: center; }
-          ul { list-style: none; padding: 0; }
-          li { margin: 5px 0; }
+          body {
+      font-family: 'Arial', sans-serif;
+      max-width: 300px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      margin: 0;
+    }
+    h1 {
+      font-size: 24px;
+      color: #333;
+    }
+    h2 {
+      font-size: 18px;
+      color: #555;
+      margin-bottom: 10px;
+    }
+    .store-info {
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+      margin-bottom: 15px;
+    }
+    .store-info p {
+      margin: 5px 0;
+    }
+    .receipt-details {
+      font-size: 14px;
+      color: #333;
+      margin-bottom: 15px;
+    }
+    .receipt-details p {
+      margin: 5px 0;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    li {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #444;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #777;
+      margin-top: 20px;
+    }
+    .footer p {
+      margin: 5px 0;
+    }
         </style>
 
       `;
